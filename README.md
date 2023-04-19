@@ -20,13 +20,15 @@ Rodar em docker
 Reclamando do arquivo:
     /opt/infinispan/server/conf/infinispan-keycloak.xml
 
-Fiz copia na imagem:
+Corrigido com copia na imagem:
     COPY --chown=ispn:ispn ./infinispan-keycloak.xml /opt/infinispan/server/conf/infinispan-keycloak.xml
 
 ===================================================
 
 Arquivo faltando:
     ERROR: /opt/keycloak/conf/jgroups.p12 (No such file or directory)
+
+Esse arquivo precisa ser enviado para que possamos validar o ambiente de testes.
 
 ===================================================
 
@@ -35,7 +37,7 @@ Invalid credentials
     keycloak             | 2023-04-19 13:21:23,565 WARN  [org.infinispan.HOTROD] (Thread-0) ISPN004005: Error received from the server: java.lang.SecurityException: ISPN028027: Invalid credentials
     keycloak             | javax.security.sasl.SaslException: ELY05051: Callback handler does not support credential acquisition [Caused by org.wildfly.security.auth.callback.FastUnsupportedCallbackException: javax.security.auth.callback.PasswordCallback@7b092f9d]
 
-Problema ocorre ao trocar senhas, entra em conflito com o arquivo cache-ispn-remote.xml que possui senhas no corpo.
+Problema ocorre ao trocar senhas no docker-compose, entra em conflito com o arquivo cache-ispn-remote.xml que possui senhas no corpo.
 
                     <authentication>
                         <digest username="${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}"
@@ -53,7 +55,7 @@ Ao habilitar o command no docker-compose a entrada no painel de adm fica em loop
 
 ===================================================
 
-
+Subindo ultima versao funcional...
 
 
 

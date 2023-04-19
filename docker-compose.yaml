@@ -19,8 +19,11 @@ services:
         - "5432"        
 
   keycloak:
-      image: clecio/keycloak_y:1.0 # quay.io/keycloak/keycloak:20.0.3
-      #command: start-dev
+      #image: clecio/keycloak_y:1.0 # quay.io/keycloak/keycloak:20.0.3
+      # command: start-dev
+      build:
+        context: "./keycloak"
+        dockerfile: "./Dockerfile"      
       container_name: keycloak
       environment:
         DB_VENDOR: POSTGRES
@@ -46,15 +49,15 @@ services:
         - "--verbose"
         - "start-dev"
         - "--http-enabled=true"
-      # - "--http-relative-path=/auth"
-        - "--http-port=8080"
+        # - "--http-relative-path=/auth" # ***** Resource not found *****
+        - "--http-port=8080"                                               
         - "--proxy=passthrough"
-        - "--hostname=localhost:8080"
+        # - "--hostname=localhost:8080" # Muda localhost
         - "--spi-events-listener-jboss-logging-success-level=info"
         - "--spi-events-listener-jboss-logging-error-level=warn"
         - "--cache-config-file=cache-ispn-remote.xml" # ???
-      #  - "--spi-sticky-session-encoder-infinispan-should-attach-route=false"
-      #  - "-Djboss.site.name=site1"
+        - "--spi-sticky-session-encoder-infinispan-should-attach-route=false"
+        - "-Djboss.site.name=site1"
 
         # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
         #JDBC_PARAMS: "ssl=true"
@@ -68,8 +71,11 @@ services:
         - db-keycloak
 
   infinispan-server:
-    image: clecio/infinispan_y:1.0 # quay.io/infinispan/server:13.0.15.Final-1
+    #image: clecio/infinispan_y:1.0 # quay.io/infinispan/server:13.0.15.Final-1
     container_name: infinispan
+    build: ./infinispan
+    volumes:
+      - ./infinispan/conf/infinispan-keycloak-database.xml:/opt/infinispan/server/conf/infinispan-keycloak.xml:z    
     environment:
       DB_HOSTNAME: db-infispan
       DB_USERNAME: infinispan
