@@ -1,0 +1,64 @@
+version: '3'
+
+volumes:
+  postgres_data:
+      driver: local
+
+services:
+
+  db-keycloak:
+      image: postgres
+      container_name: db-keycloak
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: keycloak
+
+  keycloak:
+      image: clecio/keycloak_y:1.0 # quay.io/keycloak/keycloak:20.0.3
+      command: start-dev
+      container_name: keycloak
+      environment:
+        DB_VENDOR: POSTGRES
+        DB_ADDR: db-keycloak
+        DB_DATABASE: keycloak
+        DB_USER: keycloak
+        DB_SCHEMA: public
+        DB_PASSWORD: keycloak
+        KEYCLOAK_ADMIN: keycloak
+        KEYCLOAK_ADMIN_PASSWORD: keycloak
+        KEYCLOAK_USER: keycloak
+        KEYCLOAK_PASSWORD: keycloak
+        # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+        #JDBC_PARAMS: "ssl=true"
+      ports:
+        - 8080:8080
+      depends_on:
+        - db-keycloak
+
+  infinispan-server:
+    image: clecio/infinispan_y:1.0 # quay.io/infinispan/server:13.0.15.Final-1
+    container_name: infinispan
+    environment:
+      DB_HOSTNAME: db-infispan
+      DB_USERNAME: infinispan
+      DB_PASSWORD: infinispan
+      DB_DATABASE: infinispan
+      USER: infinispan
+      PASS: infinispan
+    ports:
+      - "11222:11222"
+    depends_on:
+      - db-infinispan
+
+  db-infinispan:
+      image: postgres
+      container_name: db-infinispan
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: infinispan
+        POSTGRES_USER: infinispan
+        POSTGRES_PASSWORD: infinispan
